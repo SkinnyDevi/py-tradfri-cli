@@ -2,3 +2,4 @@ __pycache__
 libcoap
 tester.py
 tradfri_standalone_psk.conf
+.env
