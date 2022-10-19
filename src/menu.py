@@ -2,6 +2,18 @@ from datetime import datetime
 import time
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 class CLIMenu:
     """CLI menu to be interacted with."""
     displayed = False
@@ -29,7 +41,16 @@ class CLIMenu:
         log_timestamp = f"{format_time(log_timestamp.hour)}:{format_time(log_timestamp.minute)}:{format_time(log_timestamp.second)}"
 
         if type == 'log' or 'cmd' or 'warn' or 'error':
-            log_msg = f"[{type.upper()}] {log_timestamp} [{author}]: {msg}"
+            if type == 'log':
+                colour = bcolors.OKGREEN
+            elif type == 'cmd':
+                colour = bcolors.OKBLUE
+            elif type == 'warn':
+                colour = bcolors.WARNING
+            else:
+                colour = bcolors.FAIL
+
+            log_msg = f"[{colour}{type.upper()}{bcolors.ENDC}] {log_timestamp} [{author}]: {msg}"
 
             if wants_message:
                 return log_msg
