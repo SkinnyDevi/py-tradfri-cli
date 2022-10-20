@@ -9,7 +9,7 @@ from src.menu import CLIMenu
 
 class CmdDevice(DeviceCommand):
     def __init__(self, gateway_api, gateway: Gateway):
-        super().__init__("device", gateway_api, gateway, "device")
+        super().__init__("device", gateway_api, gateway, "device", True)
 
     # Examples:
     # device set light 1(device_id) level 100(%)
@@ -32,7 +32,7 @@ class CmdDevice(DeviceCommand):
             return CLIMenu.log(f"{device.name} is not a light.", 'error', self.log_author)
         self.observe(device, 5)
 
-        CLIMenu.log('Changing light state...', 'log', self.log_author)
+        CLIMenu.log('Changing light level...', 'log', self.log_author)
 
         if self.params[3] == 'level':
             new_level = int(254 * (int(self.params[-1])/100))
@@ -48,8 +48,16 @@ class CmdDevice(DeviceCommand):
     def toggle_light(self, device: Device):
         if not device.has_light_control:
             return CLIMenu.log(f"{device.name} is not a light.", 'error', self.log_author)
+        self.observe(device, 5)
 
-        light = device
+        CLIMenu.log('Toggling light state...', 'log', self.log_author)
+
+        colour_change = device.light_control.set_state(
+            not device.light_control.lights[0].state)
+        self.gateway_api(colour_change)
+
+        time.sleep(5)
+        CLIMenu.log("Light was toggled correctly.", 'log', self.log_author)
 
     def _get_device(self):
         return self.devices[int(self.params[2]) - 1]

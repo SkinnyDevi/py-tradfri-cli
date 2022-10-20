@@ -4,7 +4,7 @@ from pytradfri.error import RequestTimeout
 import sys
 import bcrypt
 
-from menu import CLIMenu
+from menu import CLIMenu, bcolors
 from tradfri_connection.gateway_connector import TradfriGatewayConnector
 
 from command.device import CmdDevice
@@ -13,7 +13,7 @@ from command.device import CmdDevice
 use_pwd = getpass("Input the password to start using your lights: ")
 
 if not bcrypt.checkpw(use_pwd.encode('utf8'), config("SCRIPT_PWD").encode('utf8')):
-    print("[ERROR]: Incorrect password to use lights.")
+    print(f"[{bcolors.FAIL}ERROR{bcolors.ENDC}]: Incorrect password to use lights.")
     sys.exit(0)
 
 l_author = CLIMenu.log_author

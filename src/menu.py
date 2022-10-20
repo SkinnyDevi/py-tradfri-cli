@@ -50,7 +50,7 @@ class CLIMenu:
             else:
                 colour = bcolors.FAIL
 
-            log_msg = f"[{colour}{type.upper()}{bcolors.ENDC}] {log_timestamp} [{author}]: {msg}"
+            log_msg = f"[{colour}{type.upper()}{bcolors.ENDC}] {bcolors.HEADER}{log_timestamp}{bcolors.ENDC} [{bcolors.OKBLUE}{author}{bcolors.ENDC}]: {msg}"
 
             if wants_message:
                 return log_msg

@@ -6,13 +6,14 @@ from src.menu import CLIMenu
 
 
 class DeviceCommand:
-    def __init__(self, identifier: str, gateway_api, gateway: Gateway, log_author):
+    def __init__(self, identifier: str, gateway_api, gateway: Gateway, log_author, needs_devices=False):
         self.gateway_api = gateway_api
         self.gateway = gateway
         self.identifier = "command" if identifier is None else identifier
         self.log_author = "commandauthor" if log_author is None else log_author
         self.params = None
         self.devices: list[Device] = None
+        self.needs_devices = needs_devices
 
     def _run(self):
         pass
@@ -20,6 +21,9 @@ class DeviceCommand:
     def _runner_check(self, devices, params=None):
         try:
             self.params = params
+            if self.needs_devices:
+                return CLIMenu.log('Unable to run command without a list of devices.', 'error', self.log_author)
+
             self.devices = devices
             self._run()
         except RequestTimeout:

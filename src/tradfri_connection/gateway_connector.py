@@ -53,5 +53,5 @@ class TradfriGatewayConnector:
         self.gateway_api = api_factory.request
         self.gateway = Gateway()
 
-        CLIMenu.log("Successfully connected to the Tradfri Gateway.",
+        CLIMenu.log("Successfully gathered authentication for Gateway connection.",
                     'log', TradfriGatewayConnector.log_author)
