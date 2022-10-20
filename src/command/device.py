@@ -14,7 +14,7 @@ class CmdDevice(DeviceCommand):
     # Examples:
     # device set light 1(device_id) level 100(%)
     # device set light 41(device_id) colour 48(%)
-    # device set blind 12(device_id) level 48(%)
+    # device set blind 12(device_id) 48(%)
     # device toggle 4(device_id) [has to be a light]
     def _run(self):
         device = self._get_device()
@@ -40,10 +40,20 @@ class CmdDevice(DeviceCommand):
                 new_level, transition_time=7)
             self.gateway_api(change_level)
             time.sleep(5)
-            CLIMenu.log("Level changed successfully.", 'log', self.log_author)
+            CLIMenu.log("Light level changed successfully.",
+                        'log', self.log_author)
 
     def set_blind_state(self, device: Device):
-        pass
+        if not device.has_blind_control:
+            return CLIMenu.log(f"{device.name} is not a blind.", 'error', self.log_author)
+        self.observe(device, 5)
+
+        change_level = device.blind_control.set_state(int(self.params[-1]))
+        self.gateway_api(change_level)
+
+        time.sleep(5)
+        CLIMenu.log("Blind level was changed successfully.",
+                    'log', self.log_author)
 
     def toggle_light(self, device: Device):
         if not device.has_light_control:
