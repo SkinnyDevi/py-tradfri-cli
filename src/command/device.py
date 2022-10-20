@@ -1,3 +1,4 @@
+from turtle import update
 from pytradfri import Gateway
 from pytradfri.device import Device
 import threading
@@ -17,17 +18,17 @@ class CmdDevice(DeviceCommand):
     # device set blind 12(device_id) 48(%)
     # device toggle 4(device_id) [has to be a light]
     def _run(self):
-        device = self._get_device()
-
         if self.params[0] == 'set':
+            device = self._get_device(2)
             if self.params[1] == 'light':
-                self.set_light_state(device)
+                self.set_light_level(device)
             else:
-                self.set_blind_state(device)
+                self.set_blind_level(device)
         elif self.params[0] == 'toggle':
+            device = self._get_device(1)
             self.toggle_light(device)
 
-    def set_light_state(self, device: Device):
+    def set_light_level(self, device: Device):
         if not device.has_light_control:
             return CLIMenu.log(f"{device.name} is not a light.", 'error', self.log_author)
         self.observe(device, 5)
@@ -43,15 +44,15 @@ class CmdDevice(DeviceCommand):
             CLIMenu.log("Light level changed successfully.",
                         'log', self.log_author)
 
-    def set_blind_state(self, device: Device):
+    def set_blind_level(self, device: Device):
         if not device.has_blind_control:
             return CLIMenu.log(f"{device.name} is not a blind.", 'error', self.log_author)
-        self.observe(device, 5)
+        self.observe(device, 10)
 
         change_level = device.blind_control.set_state(int(self.params[-1]))
         self.gateway_api(change_level)
 
-        time.sleep(5)
+        time.sleep(11)
         CLIMenu.log("Blind level was changed successfully.",
                     'log', self.log_author)
 
@@ -69,18 +70,23 @@ class CmdDevice(DeviceCommand):
         time.sleep(5)
         CLIMenu.log("Light was toggled correctly.", 'log', self.log_author)
 
-    def _get_device(self):
-        return self.devices[int(self.params[2]) - 1]
+    def _get_device(self, cmd_index):
+        return self.devices[int(self.params[cmd_index]) - 1]
 
     def observe(self, device: Device, timeout: int):
         """Observes a device."""
 
         def callback(updated_device):
             assert isinstance(updated_device, Device)
-            assert updated_device.light_control is not None
-            light = updated_device.light_control.lights[0]
-            updated_level = int(
-                (int(light.dimmer if light.dimmer is not None else 0) / 254) * 100)
+            if updated_device.has_light_control:
+                light = updated_device.light_control.lights[0]
+                updated_level = int(
+                    (int(light.dimmer if light.dimmer is not None else 0) / 254) * 100)
+
+            elif updated_device.has_blind_control:
+                blind = updated_device.blind_control.blinds[0]
+                updated_level = int(
+                    (int(blind.current_cover_position if blind.current_cover_position is not None else 0) / 100) * 100)
 
             CLIMenu.log(
                 f"Received message for: {updated_device.name} at {updated_level}%", 'log', self.log_author+"_observer")

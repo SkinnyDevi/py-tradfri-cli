@@ -21,7 +21,7 @@ class DeviceCommand:
     def _runner_check(self, devices, params=None):
         try:
             self.params = params
-            if self.needs_devices:
+            if self.needs_devices and devices is None:
                 return CLIMenu.log('Unable to run command without a list of devices.', 'error', self.log_author)
 
             self.devices = devices
