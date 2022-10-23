@@ -9,14 +9,27 @@ from src.menu import CLIMenu
 
 
 class CmdDevice(DeviceCommand):
+    """Called with 'device'
+
+    parameters: set, toggle
+
+    set parameters: blind or light (deviceID) to level X(%)
+    toggle parameters: deviceID
+
+    Examples:
+
+    device set light 1(device_id) level 100(%)
+
+    device set light 41(device_id) colour #565656
+
+    device set blind 12(device_id) 48(%)
+
+    device toggle 4(device_id) [has to be a light or socket]
+    """
+
     def __init__(self, gateway_api, gateway: Gateway):
         super().__init__("device", gateway_api, gateway, "device", True)
 
-    # Examples:
-    # device set light 1(device_id) level 100(%)
-    # device set light 41(device_id) colour 48(%)
-    # device set blind 12(device_id) 48(%)
-    # device toggle 4(device_id) [has to be a light]
     def run(self):
         if self.params[0] == 'set':
             device = self.__get_device(2)
@@ -29,6 +42,8 @@ class CmdDevice(DeviceCommand):
             self.toggle_device(device)
 
     def set_light_level(self, device: Device):
+        """Sets the the light to a specified level."""
+
         if not device.has_light_control:
             return CLIMenu.log(f"{device.name} is not a light.", 'error', self.log_author)
         self.observe(device, 5)
@@ -45,6 +60,8 @@ class CmdDevice(DeviceCommand):
                         'log', self.log_author)
 
     def set_blind_level(self, device: Device):
+        """Sets the blind to a specified level."""
+
         if not device.has_blind_control:
             return CLIMenu.log(f"{device.name} is not a blind.", 'error', self.log_author)
         self.observe(device, 10)
@@ -57,6 +74,8 @@ class CmdDevice(DeviceCommand):
                     'log', self.log_author)
 
     def toggle_device(self, device: Device):
+        """Toggles the state of a light or socket."""
+
         if not device.has_light_control and not device.has_socket_control:
             return CLIMenu.log(f"{device.name} is not a light nor socket.", 'error', self.log_author)
         self.observe(device, 5)
@@ -83,10 +102,11 @@ class CmdDevice(DeviceCommand):
                         'log', self.log_author)
 
     def __get_device(self, cmd_index):
+        """Gets the wanted device from the list."""
         return self.devices[int(self.params[cmd_index]) - 1]
 
     def observe(self, device: Device, timeout: int):
-        """Observes a device."""
+        """Observes a device's changes."""
 
         def callback(updated_device):
             assert isinstance(updated_device, Device)
@@ -105,7 +125,7 @@ class CmdDevice(DeviceCommand):
                 updated_level = 0 if socket.state is False else 100
 
             CLIMenu.log(
-                f"Received message for: {updated_device.name} at {updated_level}%", 'log', self.log_author+"_observer")
+                f"Received update for: {updated_device.name} at {updated_level}%", 'log', self.log_author+"_observer")
 
         def err_callback(err):
             print(err)

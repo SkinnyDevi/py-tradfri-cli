@@ -17,6 +17,8 @@ class TradfriGatewayConnector:
         self.gateway: Gateway = None
 
     def connect_gateway(self):
+        """Generates a file needed for a communication with the Gateway."""
+
         host_ip = config("GATEWAY_IP")
         key_code = config("GATEWAY_SC").strip()
 

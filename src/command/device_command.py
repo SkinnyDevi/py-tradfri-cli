@@ -6,6 +6,8 @@ from src.menu import CLIMenu
 
 
 class DeviceCommand:
+    """General command class used for making commands."""
+
     def __init__(self, identifier: str, gateway_api, gateway: Gateway, log_author: str, needs_devices=False):
         self.gateway_api = gateway_api
         self.gateway = gateway
@@ -16,9 +18,14 @@ class DeviceCommand:
         self.needs_devices = needs_devices
 
     def run(self):
+        """The code to run when the command is called."""
         pass
 
     def runner_check(self, devices, params=None):
+        """Try any requests for the Gateway (if any) and checks for needed
+                parameters before running the command.
+        """
+
         try:
             self.params = params
             if self.needs_devices and devices is None:
@@ -35,4 +42,5 @@ class DeviceCommand:
                 CLIMenu.log('Request timed out.', 'error', self.log_author)
 
     def setup(self):
+        """Used for setting up and registering the command."""
         return [self.identifier, self.runner_check]

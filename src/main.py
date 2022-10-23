@@ -14,6 +14,8 @@ from .command.device import CmdDevice
 
 
 def setup_commands(gateway_api, gateway: Gateway):
+    """Register the available commands for use.º"""
+
     CLIMenu.log('Setting up commands...', 'log', "Commands")
     cmds = [
         CmdDevice(gateway_api, gateway).setup()
@@ -22,7 +24,9 @@ def setup_commands(gateway_api, gateway: Gateway):
     return cmds
 
 
-def gather_devices(gateway_api, gateway):
+def gather_devices(gateway_api, gateway: Gateway):
+    """Gathers the devices from the Tradfri Gateway connection for further use."""
+
     CLIMenu.log('Gathering device list...', 'log', "devices")
 
     def device_gatherer():
@@ -56,7 +60,8 @@ def gather_devices(gateway_api, gateway):
 
 
 def main():
-    use_pwd = getpass("Input the password to start using your lights: ")
+    use_pwd = getpass(CLIMenu.log(
+        "Input the password to start using your lights: ", 'warn', 'Message', True))
 
     if not bcrypt.checkpw(use_pwd.encode('utf8'), config("SCRIPT_PWD").encode('utf8')):
         print(

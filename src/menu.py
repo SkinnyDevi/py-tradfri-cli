@@ -40,25 +40,27 @@ class CLIMenu:
         log_timestamp = datetime.now()
         log_timestamp = f"{format_time(log_timestamp.hour)}:{format_time(log_timestamp.minute)}:{format_time(log_timestamp.second)}"
 
-        if type == 'log' or 'cmd' or 'warn' or 'error':
-            if type == 'log':
-                colour = bcolors.OKGREEN
-            elif type == 'cmd':
-                colour = bcolors.OKBLUE
-            elif type == 'warn':
-                colour = bcolors.WARNING
-            else:
-                colour = bcolors.FAIL
+        if not (type == 'log' or 'cmd' or 'warn' or 'error'):
+            raise CLIMenu.LogError("Unknown log type.")
 
-            log_msg = f"[{colour}{type.upper()}{bcolors.ENDC}] {bcolors.HEADER}{log_timestamp}{bcolors.ENDC} [{bcolors.OKBLUE}{author}{bcolors.ENDC}]: {msg}"
-
-            if wants_message:
-                return log_msg
-            time.sleep(0.1)
-            print(log_msg)
+        if type == 'log':
+            colour = bcolors.OKGREEN
+        elif type == 'cmd':
+            colour = bcolors.OKBLUE
+        elif type == 'warn':
+            colour = bcolors.WARNING
         else:
-            raise CLIMenu.LogError("Especified logger type was not found.")
+            colour = bcolors.FAIL
+
+        log_msg = f"[{colour}{type.upper()}{bcolors.ENDC}] {bcolors.HEADER}{log_timestamp}{bcolors.ENDC} [{bcolors.OKBLUE}{author}{bcolors.ENDC}]: {msg}"
+
+        if wants_message:
+            return log_msg
+
+        time.sleep(0.1)
+        print(log_msg)
 
     @staticmethod
     def prompt_cmd():
+        """Prompts the user for a command."""
         return input(CLIMenu.log('> ', 'cmd', 'Command', True))
