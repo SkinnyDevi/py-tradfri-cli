@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "tradfri-test"
-version = "0.1.0"
+name = "pyfri-cli"
+version = "0.5.0"
 description = ""
 authors = ["SkinnyDevi <xthesmartdartx@gmail.com>"]
 readme = "README.md"
-packages = [{include = "src"}]
+packages = [{include = "pyfri-cli"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
