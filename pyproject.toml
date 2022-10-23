@@ -8,8 +8,6 @@ packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-conda = "^4.3.16"
-openwsn-coap = "^0.0.8"
 pytradfri = "^11.0.0"
 python-decouple = "^3.6"
 bcrypt = "^4.0.1"

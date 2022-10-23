@@ -17,16 +17,16 @@ class CmdDevice(DeviceCommand):
     # device set light 41(device_id) colour 48(%)
     # device set blind 12(device_id) 48(%)
     # device toggle 4(device_id) [has to be a light]
-    def _run(self):
+    def run(self):
         if self.params[0] == 'set':
-            device = self._get_device(2)
+            device = self.__get_device(2)
             if self.params[1] == 'light':
                 self.set_light_level(device)
             else:
                 self.set_blind_level(device)
         elif self.params[0] == 'toggle':
-            device = self._get_device(1)
-            self.toggle_light(device)
+            device = self.__get_device(1)
+            self.toggle_device(device)
 
     def set_light_level(self, device: Device):
         if not device.has_light_control:
@@ -56,21 +56,33 @@ class CmdDevice(DeviceCommand):
         CLIMenu.log("Blind level was changed successfully.",
                     'log', self.log_author)
 
-    def toggle_light(self, device: Device):
-        if not device.has_light_control:
-            return CLIMenu.log(f"{device.name} is not a light.", 'error', self.log_author)
+    def toggle_device(self, device: Device):
+        if not device.has_light_control and not device.has_socket_control:
+            return CLIMenu.log(f"{device.name} is not a light nor socket.", 'error', self.log_author)
         self.observe(device, 5)
 
-        CLIMenu.log('Toggling light state...', 'log', self.log_author)
+        if device.has_light_control:
+            CLIMenu.log('Toggling light state...', 'log', self.log_author)
 
-        colour_change = device.light_control.set_state(
-            not device.light_control.lights[0].state)
-        self.gateway_api(colour_change)
+            state_change = device.light_control.set_state(
+                not device.light_control.lights[0].state)
+            self.gateway_api(state_change)
 
-        time.sleep(5)
-        CLIMenu.log("Light was toggled correctly.", 'log', self.log_author)
+            time.sleep(5)
+            CLIMenu.log("Light was toggled correctly.",
+                        'log', self.log_author)
+        elif device.has_socket_control:
+            CLIMenu.log('Toggling socket state...', 'log', self.log_author)
 
-    def _get_device(self, cmd_index):
+            state_change = device.socket_control.set_state(
+                not device.socket_control.sockets[0].state)
+            self.gateway_api(state_change)
+
+            time.sleep(5)
+            CLIMenu.log("Socket was toggled correctly.",
+                        'log', self.log_author)
+
+    def __get_device(self, cmd_index):
         return self.devices[int(self.params[cmd_index]) - 1]
 
     def observe(self, device: Device, timeout: int):
@@ -88,6 +100,10 @@ class CmdDevice(DeviceCommand):
                 updated_level = int(
                     (int(blind.current_cover_position if blind.current_cover_position is not None else 0) / 100) * 100)
 
+            elif updated_device.has_socket_control:
+                socket = updated_device.socket_control.sockets[0]
+                updated_level = 0 if socket.state is False else 100
+
             CLIMenu.log(
                 f"Received message for: {updated_device.name} at {updated_level}%", 'log', self.log_author+"_observer")
 
@@ -103,7 +119,7 @@ class CmdDevice(DeviceCommand):
                     'log', self.log_author)
         time.sleep(1)
 
-    def _runner_check(self, devices, params):
+    def runner_check(self, devices, params):
         if len(params) < 1:
             return CLIMenu.log("device command takes various arguments.", 'error', self.log_author)
-        super()._runner_check(devices, params)
+        super().runner_check(devices, params)

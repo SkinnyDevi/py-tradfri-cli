@@ -12,22 +12,22 @@ class TradfriGatewayConnector:
     log_author = "GatewayConnector"
 
     def __init__(self):
-        self._CONFIG_FILE = "tradfri_standalone_psk.conf"
+        self.__CONFIG_FILE = "tradfri_standalone_psk.conf"
         self.gateway_api = None
-        self.gateway = None
+        self.gateway: Gateway = None
 
     def connect_gateway(self):
         host_ip = config("GATEWAY_IP")
         key_code = config("GATEWAY_SC").strip()
 
-        if not bool(load_json(self._CONFIG_FILE)):
+        if not bool(load_json(self.__CONFIG_FILE)):
             CLIMenu.log("No standalone PSK found, gathering info to generate a new one...",
                         'warn', TradfriGatewayConnector.log_author)
 
             if len(key_code) != 16:
                 raise PytradfriError("Invalid 'Security Code' provided.")
 
-        conf = load_json(self._CONFIG_FILE)
+        conf = load_json(self.__CONFIG_FILE)
         try:
             CLIMenu.log('Gathering standalone PSK for connection...',
                         'log', TradfriGatewayConnector.log_author)
@@ -45,7 +45,7 @@ class TradfriGatewayConnector:
             try:
                 psk = api_factory.generate_psk(key_code)
                 conf[host_ip] = {'identity': identity, 'key': psk}
-                save_json(self._CONFIG_FILE, conf)
+                save_json(self.__CONFIG_FILE, conf)
             except AttributeError as err:
                 raise PytradfriError(
                     "No security key was provided to attempt connection with Gateway.") from err
