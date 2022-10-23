@@ -5,7 +5,7 @@ from pytradfri.util import load_json, save_json
 from pytradfri.api.libcoap_api import APIFactory
 from decouple import config
 
-from src.menu import CLIMenu
+from ..menu import CLIMenu
 
 
 class TradfriGatewayConnector:

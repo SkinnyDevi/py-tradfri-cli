@@ -2,7 +2,7 @@ from pytradfri import Gateway
 from pytradfri.error import RequestTimeout
 from pytradfri.device import Device
 
-from src.menu import CLIMenu
+from ..menu import CLIMenu
 
 
 class DeviceCommand:

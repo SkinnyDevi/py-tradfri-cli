@@ -5,7 +5,7 @@ import threading
 import time
 
 from .device_command import DeviceCommand
-from src.menu import CLIMenu
+from ..menu import CLIMenu
 
 
 class CmdDevice(DeviceCommand):
