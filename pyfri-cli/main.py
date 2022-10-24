@@ -11,6 +11,7 @@ from .menu import CLIMenu, bcolors
 from .tradfri_connection.gateway_connector import TradfriGatewayConnector
 
 from .command.device import CmdDevice
+from .command.info import CmdInfo
 
 
 def setup_commands(gateway_api, gateway: Gateway):
@@ -18,7 +19,8 @@ def setup_commands(gateway_api, gateway: Gateway):
 
     CLIMenu.log('Setting up commands...', 'log', "Commands")
     cmds = [
-        CmdDevice(gateway_api, gateway).setup()
+        CmdDevice(gateway_api, gateway).setup(),
+        CmdInfo(gateway_api, gateway).setup()
     ]
     CLIMenu.log('Setup completed.', 'log', "Commands")
     return cmds

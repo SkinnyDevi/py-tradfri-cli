@@ -1,4 +1,3 @@
-from turtle import update
 from pytradfri import Gateway
 from pytradfri.device import Device
 import threading
